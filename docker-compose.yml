@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: walletuser
+      POSTGRES_PASSWORD: walletpass
+      POSTGRES_DB: cryptowallet
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  app:
+    build: .
+    container_name: crypto-wallet-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/cryptowallet
+      SPRING_DATASOURCE_USERNAME: walletuser
+      SPRING_DATASOURCE_PASSWORD: walletpass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      COINCAP_API_KEY: your_api_key_here
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
